@@ -1,21 +1,23 @@
 <?php
-require_once('../../config/database.php');
+require_once('../../../config/database.php');
 
 class petitionRead
 {
     function __construct()
     {
     }
-    
+
     public static function consultarUsuario($user, $pass)
     {
-        $consulta = "SELECT * FROM sistemalogin WHERE matricula=? AND pass=?";
+        $consulta = "SELECT * FROM login WHERE user=? AND pass=?";
         try {
             $sql = Database::getInstance()->getDb()->prepare($consulta);
             $sql->execute([$user, $pass]);
             $cont = $sql->rowCount();
             if ($cont == 1) {
                 $respuesta = $sql->fetchAll(PDO::FETCH_ASSOC);
+            } elseif ($cont == 0) {
+                $respuesta = false;
             } else {
                 $respuesta = false;
             }
