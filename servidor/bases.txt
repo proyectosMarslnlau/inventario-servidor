@@ -1,0 +1,7 @@
+BASES DE DATOS
+DATOS ADMINISTRADOR
+id user pass imagenDefault
+
+DATOS DE INVENTARIO
+id codigo nombre lugar costo anio depreciacion imagen qr
+
