@@ -1,0 +1,13 @@
+{
+    "name": "alvaro/servidor",
+    "authors": [
+        {
+            "name": "proyectosMarslnlau",
+            "email": "ingmarcelopoma@gmail.com"
+        }
+    ],
+    "require": {
+        "endroid/qr-code": "^2.5",
+        "pugx/shortid-php": "^0.1.0"
+    }
+}
