@@ -1,0 +1,28 @@
+html {
+  font-size: 15px;
+}
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+main {
+  flex: 1 0 auto;
+}
+/**/
+.nav-wrapper {
+  background-color: #5C0116 !important;
+}
+nav ul a{
+  font-size: 0.9rem;
+}
+nav .logo-boplus {
+  width: 78%;
+}
+/**/
+footer {
+  font-size: 1rem;
+  background: 'red';
+  font-family: 'Montserrat',
+  sans-serif;
+}

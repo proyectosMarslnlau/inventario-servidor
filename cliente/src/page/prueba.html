@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inicio</title>
+
+    <!-- CSS  NORMALIZE-->
+    <link rel="stylesheet" href="../sheet_public/css/normalize.css">
+    <link rel="stylesheet" href="../sheet_page/css/default.css">
+    <!-- ESTILO CSS de MATERILIZE  -->
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- ESTILO CSS de plugin de carga SK-CIRCLE  -->
+
+    <!-- ESTILO CSS de hoja HTML  -->
+    <link rel="stylesheet" href="../sheet_page/css/page/login.css" />
+    <!-- Axios y JQUERY para los comandos  -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="../sheet_page/js/constants.js"></script>
+
+</head>
+<script>
+    $(document).ready(function () {
+        $('#imageFile').change(function (evt) {
+
+            var files = evt.target.files;
+            var file = files[0];
+
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('preview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+
+    });
+    function ResizeImage() {
+        if (window.File && window.FileReader && window.FileList && window.Blob) {
+            var filesToUploads = document.getElementById('imageFile').files;
+            var file = filesToUploads[0];
+            if (file) {
+
+                var reader = new FileReader();
+                // Set the image once loaded into file reader
+                reader.onload = function (e) {
+
+                    var img = document.createElement("img");
+                    img.src = e.target.result;
+
+                    var canvas = document.createElement("canvas");
+                    var ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+
+                    var MAX_WIDTH = 400;
+                    var MAX_HEIGHT = 400;
+                    var width = img.width;
+                    var height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    var ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    dataurl = canvas.toDataURL(file.type);
+                    console.log(dataurl);
+                    document.getElementById('output').src = dataurl;
+                }
+                reader.readAsDataURL(file);
+
+            }
+
+        } else {
+            alert('The File APIs are not fully supported in this browser.');
+        }
+    }
+</script>
+
+<body>
+    <main>
+        <input id="imageFile" name="imageFile" type="file" class="imageFile" accept="image/*" />
+        <input type="button" value="Resize Image" onclick="ResizeImage()" />
+        <br />
+        <img src="" id="preview">
+        <img src="" id="output">
+
+    </main>
+
+    <!--------------------------------------- Footer ------------------------------------------>
+    <footer class="page-footer teal">
+        <p class="hola">HOLA NUEVO MUNDO</p>
+    </footer>
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</body>
+
+</html>

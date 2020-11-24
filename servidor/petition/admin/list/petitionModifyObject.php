@@ -2,7 +2,7 @@
 //Invocamos los CORS para no tener problemas de envio de informacion
 require_once('../../../services/cors.php');
 //Invocamos las funciones de Invocacion de CREATE
-require_once('../../class/requestCreate.php');
+require_once('../../class/requestUpdate.php');
 require_once('../../class/requestRead.php');
 
 //Invocamos las CONSTANTES
@@ -20,6 +20,7 @@ header("Content-Type: application/json");
 $varEntrada = json_decode(file_get_contents('php://input'), true);
 
 //Variables
+$iddatos = $varEntrada['iddatos'];
 //$codigo = $varEntrada['codigo'];
 $code = $varEntrada['code'];
 $cifra = $varEntrada['cifra'];
@@ -30,33 +31,39 @@ $costo = $varEntrada['costo'];
 $anio = $varEntrada['anio'];
     //valor enviado en formato BASE64
 $imagen = $varEntrada['imagen'];
+
 $descripcion = $varEntrada['descripcion'];
 $estado = $varEntrada['estado'];
 
 //Saneamiento de variables de REGISTRO
-    //UNION DE VARIABLES DE CODIGO
+//UNION DE VARIABLES DE CODIGO
 $code = strtoupper($code);
 $cifra = strtoupper($cifra);
-$codigo = $code . $cifra ;    
-    //
+$codigo = $code . $cifra ;   
+
+//
 $nombre = strtolower($nombre);
 $lugar = strtolower($lugar);
 $descripcion = strtolower($descripcion);
 
 //
-$consultaCodigo = petitionRead::consultarRepeticion($code, $cifra);
-if($consultaCodigo === true){
+$consultaCodigo = petitionRead::consultarRepeticionId($iddatos);
+if($consultaCodigo === false){
     //DESCOMPOCICION DE IMAGEN de BASE64 -> PNG
     //---Generacion de ID
     $id = Shortid::generate();
     //---Declaramos la IMAGEN
     $nombreImagen = $id . "_" . $codigo .".png";
-    //---Ruta de imagen de SALIDA
-    $rutaImagenSalida = "../../../public/image/" . $nombreImagen;
-    //---Decodificacion de BASE64
-    $imagenBinaria = base64_decode($imagen);
-    //---Copiado de Imagen a la DIRECCION DESIGNADA
-    $rutaImagenFinal = file_put_contents($rutaImagenSalida, $imagenBinaria);
+
+    if($imagen !== 'vacio'){
+        //---Ruta de imagen de SALIDA
+        $rutaImagenSalida = "../../../public/image/" . $nombreImagen;
+        //---Decodificacion de BASE64
+        $imagenBinaria = base64_decode($imagen);
+        //---Copiado de Imagen a la DIRECCION DESIGNADA
+        $rutaImagenFinal = file_put_contents($rutaImagenSalida, $imagenBinaria);
+    }
+    
     //---Direccion de Imagen Final-----------
     $direccionImage = IP_SERVER . 'inventario-servidor/servidor/public/image/' . $nombreImagen;
 
@@ -81,8 +88,16 @@ if($consultaCodigo === true){
     // las vairables de imagen seran consideradas en PNG
     $direccionLugar = IP_SERVER . 'inventario-servidor/servidor/public/place/' . $lugar . '.png'; 
 
-    //CREAMOS los resultados en las variables
-    $consulta = petitionCreate::inscribirObjeto($code, $cifra, $nombre, $direccionLugar, $costo, $anio, $estado, $direccionImage, $direccionImageQR, $descripcion );
+    if($imagen === 'vacio'){
+        //CREAMOS los resultados en las variables
+        //UPDATE persons SET email='peterparker_new@mail.com' WHERE id=1
+        $consulta = petitionUpdate::editarObjetoSinImagen($code, $cifra, $nombre, $direccionLugar, $costo, $anio, $estado, $direccionImageQR, $descripcion, $iddatos );
+    }else{
+        //CREAMOS los resultados en las variables
+        //UPDATE persons SET email='peterparker_new@mail.com' WHERE id=1
+        echo 'imagen llena';
+        $consulta = petitionUpdate::editarObjeto($code, $cifra, $nombre, $direccionLugar, $costo, $anio, $estado, $direccionImage, $direccionImageQR, $descripcion, $iddatos );
+    }
     //Verifiacion de los DATOS
     if($consulta === true) {
         echo json_encode(array('response' => 'correcto'));
@@ -90,7 +105,7 @@ if($consultaCodigo === true){
         echo json_encode(array('response' => 'incorrecto'));
     }
 }else{
-    echo json_encode(array('response' => 'duplicado'));
+    echo json_encode(array('response' => 'inexistente'));
 };
 
 

@@ -1,0 +1,31 @@
+<!-- Componente MODAL area de respuesta con respuestaIcono  -->
+<script>
+    $('.modal').modal();
+    $('.modal').modal({
+        dismissible: true
+    });
+    $('.enviar-registro').click(function (e) {
+        e.preventDefault();
+        //Vaciamos la informacion cargada en el MODAL
+        $(".area-card-informacion").empty();
+        //Cerramos el MODAL
+        $('.modal').modal('close');
+    });
+</script>
+<div id="modal1" class="modal">
+    <div class="modal-content">
+        <div class="col s12 m7">
+            <h4 class="header">Informacion Objeto</h4>
+            <div class="area-card-informacion"></div>
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="row">
+            <button class="enviar-registro waves-effect waves-light btn red darken-1">
+                <i class="material-icons left">
+                    close</i> Cerrar
+            </button>
+        </div>
+    </div>
+</div>

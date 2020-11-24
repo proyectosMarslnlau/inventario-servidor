@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Modify</title>
+
+    <!-- CSS  NORMALIZE-->
+    <link rel="stylesheet" href="../sheet_public/css/normalize.css">
+    <!-- ESTILO CSS de MATERILIZE  -->
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- ESTILO CSS de plugin de carga SK-CIRCLE  -->
+    <link rel="stylesheet" href="../sheet_page/css/default.css">
+
+    <!-- ESTILO CSS de hoja HTML  -->
+    <link rel="stylesheet" href="../sheet_page/css/page/modify.css" />
+    <!-- Axios y JQUERY para los comandos  -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="../sheet_page/js/constants.js"></script>
+    <script src="../sheet_page/js/functionBase.js"></script>
+
+</head>
+<script>
+    var lugarDato = '';
+    var imagenBase64 = '';
+</script>
+<script>
+    $(document).ready(function () {
+        verificacionLogueo();
+        // Cargar codigo html DE FOOTER posible efecto modular
+        $(".footer").load("footer.html");
+        $(".area-navbar").load('../component/navbar.html');
+        $('.area-footer').load('../component/footer.html');
+        //Variables Globales
+
+
+        //Valor que realiza la funcion de redimensionar el MAP de usuario
+        $('img[usemap]').rwdImageMaps();
+
+        //Funcion que inserta un DIV con el nombre del lugar que se CLICKEA en el MAPA
+        $('area').on('click', function (e) {
+            e.preventDefault();
+            lugarDato = $(this).attr('alt');
+            //$('.lugar').empty().append(`<h5>Lugar : ${saludo}</h5>`).fadeIn(1500);
+            $('.lugar').empty().fadeOut(1000, function () {
+                $(".lugar").append(`<div>Lugar : ${lugarDato}</div>`);
+            }).fadeIn(1000);
+        });
+
+        let iddatos = localStorage.getItem("idObjecto");
+        //
+        peticionViewObject(iddatos).then(item => {
+            if (item === false) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Datos Incorrectos',
+                    text: 'No se puede enlistar los Objetos Intene mas tarde',
+                })
+            } else {
+                console.log(item[0]);
+                let lugar = item[0].lugar.split('/');
+                lugar = lugar[7].split('.');
+                lugar = lugar[0];
+                //
+                console.log(lugar);
+                asignarValor(item[0].code, item[0].cifra, item[0].nombre, item[0].costo, item[0].anio, item[0].estado, item[0].descripcion, lugar, item[0].imagen);
+            }
+        });
+        //
+        $('.datesform').submit(function (e) {
+            e.preventDefault();
+            var codigo = $(".code").val();
+            var cifra = $(".numero").val();
+            var nombre = $(".nombre").val();
+            var costo = $(".costo").val();
+            var anio = $(".anio").val();
+            var estado = $(".estado").val();
+            var descripcion = $(".descripcion").val();
+
+            var iddatos = localStorage.getItem('idObjecto');
+
+            //Enviamos al LOCAL STORE para guardar la BASE64 de la variable
+            if (imagenBase64 !== 'vacio') {
+                imagenBase64 = localStorage.getItem('imagenBase64');
+            }
+
+            if (codigo.trim() === '' || cifra.trim() === '' || nombre.trim() === '' || costo.trim() === '' || anio.trim() === '' || estado.trim() === '' || descripcion.trim() === '' || imagenBase64.trim() === '' || lugarDato.trim() === '') {
+                Swal.fire(
+                    'Faltan Datos',
+                    'Revise Nuevamente los Datos, Espacios Vacios',
+                    'question'
+                );
+
+            } else {
+                /*console.log('****************************************');
+                console.log(iddatos);
+                console.log(codigo);
+                console.log(cifra);
+                console.log(nombre);
+                console.log(costo);
+                console.log(anio);
+                console.log(estado);
+                console.log(descripcion);
+                console.log(lugarDato);
+
+                imagenBase = imagenBase64.split(",");
+                console.log(imagenBase64);
+
+            */
+                if (imagenBase64 !== 'vacio') {
+                    imagenBase = imagenBase64.split(",");
+                } else {
+                    imagenBase = 'demo,' + imagenBase64;
+                    imagenBase = imagenBase.split(",");
+                }
+                //nombre, lugar, costo, anio, descripcion, code, cifra, estado, imagen
+                peticion(iddatos, nombre, lugarDato, costo, anio, descripcion, codigo, cifra, estado, imagenBase[1]).then(item => {
+                    if (item === true) {
+                        Swal.fire(
+                            'Correcto',
+                            'Datos Enviados y Registrados',
+                            'success'
+                        );
+                    } else {
+                        Swal.fire(
+                            'Error',
+                            'No se puedo modificar Informacion intente mas tarde',
+                            'error'
+                        );
+                    }
+                })
+            }
+        });
+
+        $('#imageFile').change(function (evt) {
+            var files = evt.target.files;
+            var file = files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('preview').src = e.target.result;
+
+                };
+                reader.readAsDataURL(file);
+            }
+            ResizeImage();
+        });
+    });
+
+    //Operaciones
+    function asignarValor(code, numero, nombre, costo, anio, estado, descripcion, lugar, imagen) {
+        $('.code').val(code);
+        $('.numero').val(numero);
+        $('.nombre').val(nombre);
+        $('.costo').val(costo);
+        $('.anio').val(anio);
+        $('.estado').val(estado);
+        $('.descripcion').val(descripcion);
+
+        $('.lugar').empty().fadeOut(1000, function () {
+            $(".lugar").append(`<div>Lugar : ${lugar}</div>`);
+        }).fadeIn(100);
+
+        $("#preview").attr("src", imagen);
+
+        imagenBase64 = 'vacio';
+        lugarDato = lugar;
+    }
+    //Peticion al SERVIDOR lista de todos los CODIGOS.
+    //Peticion al SERVIDOR objeto unico.
+    async function peticionViewObject(itemid) {
+        try {
+            const url = urlViewObjeto;
+            const peticion = await axios.post(url, {
+                iddatos: itemid
+            });
+            var resultado = peticion.data.response;
+            if (resultado === 'correcto') {
+                return peticion.data.information;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    //-----------
+    //Operaciones
+    function ResizeImage() {
+        if (window.File && window.FileReader && window.FileList && window.Blob) {
+            var filesToUploads = document.getElementById('imageFile').files;
+            var file = filesToUploads[0];
+            if (file) {
+
+                var reader = new FileReader();
+                // Set the image once loaded into file reader
+                reader.onload = function (e) {
+
+                    var img = document.createElement("img");
+                    img.src = e.target.result;
+
+                    var canvas = document.createElement("canvas");
+                    var ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+
+                    var MAX_WIDTH = 400;
+                    var MAX_HEIGHT = 400;
+                    var width = img.width;
+                    var height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    var ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    dataurl = canvas.toDataURL(file.type);
+                    localStorage.setItem("imagenBase64", dataurl);
+                    imagenBase64 = 'all';
+                    //document.getElementById('output').src = dataurl;
+                }
+                reader.readAsDataURL(file);
+
+            }
+
+        } else {
+            alert('The File APIs are not fully supported in this browser.');
+        }
+    }
+    //
+    async function peticion(id, nombre, lugar, costo, anio, descripcion, code, cifra, estado, imagen) {
+        try {
+            var url = urlModifyObject;
+            const peticionLogin = await axios.post(url, {
+                iddatos: id,
+                nombre: nombre,
+                lugar: lugar,
+                costo: costo,
+                anio: anio,
+                descripcion: descripcion,
+                code: code,
+                cifra: cifra,
+                estado: estado,
+                imagen: imagen
+            });
+
+            bandera = peticionLogin.data.response;
+
+            //Peticion si el usuario se logueo correctamente
+            if (bandera === 'correcto') {
+                return true
+            } else {
+                return false
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    //Funcion de ABRIR RESET
+    function reset() {
+
+    }
+</script>
+
+<body>
+    <main>
+        <!------------ AREA NAVBAR  --------------->
+        <div class="area-navbar"></div>
+        <!------------ AREA NAVBAR  --------------->
+        <div class="container">
+            <div class="row">
+                <form class="datesform col s12">
+                    <div class="carta">
+                        <div class="row">
+                            <div class="titulo-inscripcion">Ingresa Datos del Nuevo Objeto</div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="code" type="text" class="code" name='code'>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="numero" type="text" class="numero" name='numero'>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="nombre" type="text" class="nombre" name='nombre'>
+                            </div>
+                        </div>
+                        <div class="row center-align">
+                            <img src="../sheet_public/img/estudio.jpg" alt="" usemap="#map">
+                        </div>
+                        <div class="row lugar"></div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="costo" type="text" class="costo" name='costo'>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="anio" type="text" class="anio" name='anio'>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="estado" type="text" class="estado" name='estado'>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="description" type="text" class="descripcion" name='description'>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="file-field input-field">
+                                <div class="btn">
+                                    <span>File</span>
+                                    <input type="file" id='imageFile'>
+                                </div>
+                                <div class="file-path-wrapper">
+                                    <input class="file-path validate" type="text"
+                                        placeholder="Upload one or more files">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row center-align">
+                            <img src="" id="preview">
+                        </div>
+                        <div class="row">
+                            <button
+                                class="login waves-effect waves-light btn-large col s12 boton-submit boton-registro">
+                                <i class="material-icons left">
+                                    arrow_upward</i> Modificar Informacion
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+    <div class="area-footer"></div>
+    <map name="map">
+        <area target="" alt="boljov-001" title="boljov-001" href="" coords="63,111,5,6" shape="rect">
+        <area target="" alt="boljov-002" title="boljov-002" href="" coords="6,114,63,213" shape="rect">
+        <area target="" alt="boljov-003" title="boljov-003" href="" coords="9,220,61,334" shape="rect">
+        <area target="" alt="boljov-004" title="boljov-004" href="" coords="9,335,145,392" shape="rect">
+        <area target="" alt="boljov-007" title="boljov-007" href="" coords="65,5,170,203" shape="rect">
+        <area target="" alt="boljov-008" title="boljov-008" href="" coords="172,10,309,204" shape="rect">
+        <area target="" alt="boljov-006" title="boljov-006" href="" coords="67,205,227,297" shape="rect">
+        <area target="" alt="boljov-005" title="boljov-005" href="" coords="148,297,229,393" shape="rect">
+        <area target="" alt="boljov-011" title="boljov-011" href="" coords="283,285,392,449" shape="rect">
+        <area target="" alt="boljov-012" title="boljov-012" href="" coords="393,340,504,450" shape="rect">
+        <area target="" alt="boljov-013" title="boljov-013" href="" coords="396,230,505,336" shape="rect">
+        <area target="" alt="boljov-014" title="boljov-014" href="" coords="393,118,503,226" shape="rect">
+        <area target="" alt="boljov-015" title="boljov-015" href="" coords="393,7,501,114" shape="rect">
+        <area target="" alt="boljov-009" title="boljov-009" href="" coords="312,10,393,65" shape="rect">
+        <area target="" alt="boljov-010" title="boljov-010" href="" coords="229,207,392,282" shape="rect">
+    </map>
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="../sheet_public/js/jquery.rwdImageMaps.js"></script>
+
+</body>
+
+</html>

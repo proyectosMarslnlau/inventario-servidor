@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reportes</title>
+
+    <!-- CSS  NORMALIZE-->
+    <link rel="stylesheet" href="../sheet_public/css/normalize.css">
+    <link rel="stylesheet" href="../sheet_page/css/default.css">
+    <!-- ESTILO CSS de MATERILIZE  -->
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- ESTILO CSS de plugin de carga SK-CIRCLE  -->
+
+    <!-- ESTILO CSS de hoja HTML  -->
+    <link rel="stylesheet" href="../sheet_page/css/page/report.css" />
+    <!-- Axios y JQUERY para los comandos  -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="../sheet_page/js/constants.js"></script>
+    <script src="../sheet_page/js/functionBase.js"></script>
+
+</head>
+<script>
+    $(document).ready(function () {
+        verificacionLogueo();
+
+        // Cargar codigo html DE FOOTER posible efecto modular
+        $('.area-footer').load('../component/footer.html');
+
+        $(".area-navbar").load('../component/navbar.html');
+
+        //Inicializa el componente SELECT componente MATERIALIZE
+        $('select').formSelect();
+
+        //Oculta las CARD de descarga de informacion de usuario para el inicio de PAGINA
+        $('.card-reports').hide();
+
+        //Funcion que oculta las CARD cada vez que se cambie de dato en el SELECT
+        $('.selectore').on('change', function () {
+            $('.card-reports').fadeOut(200);
+        });
+
+        //Funcion que oculta las CARD cada vez que se cambie de datos en el grupo de RADIOS
+        $("input[name='group1']").on('change', function () {
+            $('.card-reports').fadeOut(200);
+        });
+
+        //Realiza la peticion de datos AXIOS de informacion de los CODIGOS DE LA BASE DE DATOS
+        //Y los guarda en la variable de SELECT
+        peticionCodigos().then(item => {
+            if (item !== false) {
+                item.map((dato) => {
+                    var newOpt = `
+                        <option value=${dato}><strong class='selectorFont'>${dato}</strong></option>
+                    `;
+                    //Inserta codigo HTML en en el componente SELECTORE
+                    $(".selectore").append(newOpt);
+                })
+                //Se reinicia nuevamente el componente SELECT para mostrar nuevamente los datos
+                $("select").formSelect();
+            }
+        });
+
+        //Boton para generar los reportes segun el MODELO que se requira
+        $('.boton-generar').click(function (e) {
+            e.preventDefault();
+            //Extraccion del valor de RADIO BUTTONS
+            // valor 1 para ALL y valor 2 para UNIQUE
+            let valorRadio = $("input[name='group1']:checked").val();
+            console.log(valorRadio);
+            //Si se seleccionar el valor de ALL
+            if (valorRadio === '1') {
+                //Una vez creada se borra la clase de UNIQUE anterior
+                $('.link-uno').off("click");
+                $('.link-dos').off("click");
+                $('.link-tres').off("click");
+                urlArrayReportesAll.map(url => {
+                    $(".card").removeClass("cyan darken-3");
+                    $(".card").addClass("teal darken-3");
+                    if (url.number === 1) {
+                        $(".link-uno").on("click", function () {
+                            //Peticion para MODELL UNIQUE de informe
+                            window.open(url.urlmodell, 'Informe Uno');
+                            //En la misma ventana de apertura
+                            //window.location.href = url.urlmodell;
+
+
+                        });
+                    } else if (url.number === 2) {
+                        $(".link-dos").on("click", function () {
+                            //Peticion para MODELL UNIQUE de informe
+                            window.open(url.urlmodell, 'Informe Dos');
+                            //Distitan ventana de apertura
+                            //window.open(url.urlmodell, '_self');
+
+
+                        });
+                    } else if (url.number === 3) {
+                        $(".link-tres").on("click", function () {
+                            //Peticion para MODELL UNIQUE de informe
+                            window.open(url.urlmodell, 'Informe Tres');
+                        });
+                    }
+                });
+                //Nos sirve para cuando se genere nuevo reporte haga la transicion 
+                //de cambio de color como de variables de los componentes CARD
+                $('.card-reports').fadeOut(100);
+                $('.card-reports').fadeIn(1000);
+
+                //Si se selecciona el valor UNICO de CODIGO
+            } else if (valorRadio === '2') {
+                $('.link-uno').off("click");
+                $('.link-dos').off("click");
+                $('.link-tres').off("click");
+                //Extrae el valor del SELECT y nos devuelve el valor del CODIGO
+                var valor = $(".selectore").val();
+
+                //Verifica que no este marcado en ELIGA OPCION INICIAL => null
+                if (valor === null) {
+                    //Verifica si no se selecciono alguna OPCION del SELECT
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Seleccione un Codigo',
+                        text: 'Dato vacio seleccione un Codigo de Objeto',
+                    })
+                } else {
+                    //Cambia de color segun el tipo ALL || UNIQUE
+                    $(".card").removeClass("teal darken-3");
+                    $(".card").addClass("cyan darken-3");
+                    //Recorre cada dato de todos los valores de los CODIGOS
+                    urlArrayReportCode.map(url => {
+
+                        //Es necesario realizar para poder enviar un dato que llegaria a ser el
+                        //Codigo para poder enviar mediante POST con AXIOS
+                        if (url.number === 1) {
+                            //$(".link-uno").attr("href", url.urlmodell);
+                            //Inserta la funcion Click en el Boton para poder insertar los 
+                            //valores del ARRAY
+                            $(".link-uno").on("click", function () {
+                                //Peticion para MODELL UNIQUE de informe
+                                funcionPrueba(url.urlmodell, valor).then(item => {
+                                    if (item === true) {
+                                        window.open(urlPdfModellOneUnique, '_self1');
+                                    }
+                                })
+                            });
+                        } else if (url.number === 2) {
+                            //Peticion para MODELL UNIQUE de informe
+                            $(".link-dos").on("click", function () {
+                                //Peticion para MODELL UNIQUE de informe
+                                funcionPrueba(url.urlmodell, valor).then(item => {
+                                    if (item === true) {
+                                        window.open(urlPdfModellTwoUnique, '_self2');
+                                    }
+                                })
+                            });
+
+                        } else if (url.number === 3) {
+                            //Peticion para MODELL UNIQUE de informe
+                            $(".link-tres").on("click", function () {
+                                //Peticion para MODELL UNIQUE de informe
+                                funcionPrueba(url.urlmodell, valor).then(item => {
+                                    if (item === true) {
+                                        window.open(urlPdfModellThreeUnique, '_self3');
+                                    }
+                                })
+                            });
+
+                        }
+                    })
+                    $('.card-reports').fadeOut(100);
+                    $('.card-reports').fadeIn(1000);
+                }
+            }
+        });
+    });
+    //
+    async function funcionPrueba(urlModellUnique, code) {
+        try {
+            const url = urlModellUnique;
+            const peticion = await axios.post(url, {
+                code: code
+            });
+            if (peticion.data.response === 'correcto') {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    //Operaciones
+    async function peticionCodigos() {
+        try {
+            const url = urlListaCodigos;
+            const peticion = await axios.post(url);
+            var resultado = peticion.data.response;
+            if (resultado === 'correcto') {
+                return peticion.data.information;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+</script>
+
+<body>
+    <main>
+        <!------------ AREA NAVBAR  --------------->
+        <div class="area-navbar"></div>
+        <!------------ AREA NAVBAR  --------------->
+        <div class="container carta">
+            <div class="row titulos">
+                <div class="col s2">
+                    Seleccionar
+                </div>
+                <div class="col s4">
+                    Metodo
+                </div>
+                <div class="col s6">
+                    Generar
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s2">
+                    <label>
+                        <input name="group1" type="radio" checked value='1' />
+                        <span>All</span>
+                    </label>
+                </div>
+                <div class="col s4">
+                    Generar Todos los Codigos
+                </div>
+                <div class="col s6">
+                    ******
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s2">
+                    <label>
+                        <input name="group1" type="radio" value='2' />
+                        <span>Unique</span>
+                    </label>
+                </div>
+                <div class="col s4">
+                    Generar la SERIE
+                </div>
+                <div class="col s6">
+                    <form action="">
+                        <select class="selectore">
+                            <option value="0" disabled selected>Elija una opcion</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+            <div class="col s12 center-align">
+                <button class="login waves-effect waves-light btn col s12 boton-generar">
+                    <i class="material-icons left">
+                        cloud</i> Generar
+                </button>
+            </div>
+            <div class="row card-reports">
+                <div class="col s12">
+                    <h4 class="header">Modelo Uno</h4>
+                    <div class="card horizontal">
+                        <div class="card-image">
+                            <img src="../sheet_public/img/modell/modellone.PNG">
+                        </div>
+                        <div class="card-stacked">
+                            <div class="card-content">
+                                <p class="enunciado">Modelo numero uno, que genera la lista de los objetos con la
+                                    informacion pertinente con su CODIGO QR para su impresion.</p>
+                            </div>
+                            <div class="card-action">
+                                <button class="link-uno waves-effect waves-light btn boton-generar">Generar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <h4 class="header">Modelo Dos</h4>
+                    <div class="card horizontal">
+                        <div class="card-image">
+                            <img src="../sheet_public/img/modell/modelltwo.PNG">
+                        </div>
+                        <div class="card-stacked">
+                            <div class="card-content">
+                                <p class="enunciado">Modello numero dos que presenta la informacion del objeto con el
+                                    lugar de ubicacion y el codigo QR.</p>
+                            </div>
+                            <div class="card-action">
+                                <button class="link-dos waves-effect waves-light btn boton-generar">Generar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <h4 class="header">Modelo Tres</h4>
+                    <div class="card horizontal">
+                        <div class="card-image">
+                            <img src="../sheet_public/img/modell/modellthree.PNG">
+                        </div>
+                        <div class="card-stacked">
+                            <div class="card-content">
+                                <p class="enunciado">Modelo numero tres que presenta una tabla simple con la información
+                                    necesaria de objetos.</p>
+                            </div>
+                            <div class="card-action">
+                                <button class="link-tres waves-effect waves-light btn boton-generar">Generar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!--------------------------------------- Footer ------------------------------------------>
+    <div class="area-footer"></div>
+
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</body>
+
+</html>

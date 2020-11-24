@@ -6,7 +6,7 @@ class petitionRead
     function __construct()
     {
     }
-
+    //Consulta de USUARIO Y PASSWORD **************************
     public static function consultarUsuario($user, $pass)
     {
         $consulta = "SELECT * FROM login WHERE user=? AND pass=?";
@@ -27,6 +27,94 @@ class petitionRead
         }
     }
 
+    //Consulta de REPETICION DE CODGO REPETIDO ************************
+    public static function consultarRepeticion($code, $cifra)
+    {
+        $consulta = "SELECT * FROM datos WHERE code=? AND cifra=?";
+        try {
+            $sql = Database::getInstance()->getDb()->prepare($consulta);
+            $sql->execute([$code, $cifra]);
+            $cont = $sql->rowCount();
+            if ($cont < 1) {
+                $respuesta = true;
+            } else {
+                $respuesta = false;
+            }
+            return $respuesta;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+    //Consulta de REPETICION DE CODGO REPETIDO  para el ID
+    public static function consultarRepeticionId($iddatos)
+    {
+        $consulta = "SELECT * FROM datos WHERE iddatos=?";
+        try {
+            $sql = Database::getInstance()->getDb()->prepare($consulta);
+            $sql->execute([$iddatos]);
+            $cont = $sql->rowCount();
+            if ($cont < 1) {
+                $respuesta = true;
+            } else {
+                $respuesta = false;
+            }
+            return $respuesta;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+    //Consulta todos los datos **********************************
+    public static function consultarTodoObjetos()
+    {
+        $consulta = "SELECT * FROM datos";
+        try {
+            $sql = Database::getInstance()->getDb()->prepare($consulta);
+            $sql->execute();
+            $respuesta = $sql->fetchAll(PDO::FETCH_ASSOC);
+            return $respuesta;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+    //Consulta UNICO los datos ****************
+    public static function consultarUnicoObjeto($code, $cifra)
+    {
+        $consulta = "SELECT * FROM datos WHERE code=? AND cifra=?";
+        try {
+            $sql = Database::getInstance()->getDb()->prepare($consulta);
+            $sql->execute([$code, $cifra]);
+            $respuesta = $sql->fetchAll(PDO::FETCH_ASSOC);
+            return $respuesta;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+    //Consulta UNICO los datos ****************
+    public static function consultarUnicoCode($code)
+    {
+        $consulta = "SELECT * FROM datos WHERE code=?";
+        try {
+            $sql = Database::getInstance()->getDb()->prepare($consulta);
+            $sql->execute([$code]);
+            $respuesta = $sql->fetchAll(PDO::FETCH_ASSOC);
+            return $respuesta;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+    //Consulta UNICO los datos
+    public static function consultarUnicoObjetoId($iddatos)
+    {
+        $consulta = "SELECT * FROM datos WHERE iddatos=?";
+        try {
+            $sql = Database::getInstance()->getDb()->prepare($consulta);
+            $sql->execute([$iddatos]);
+            $respuesta = $sql->fetchAll(PDO::FETCH_ASSOC);
+            return $respuesta;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
     //-*******************************************************
     public static function consultarTodo($valor)
     {

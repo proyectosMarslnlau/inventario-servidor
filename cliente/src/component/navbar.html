@@ -1,0 +1,67 @@
+<script>
+  //inicializamos el navbar
+  $('.sidenav').sidenav();
+  //Funcion de SALIR  de la pagina
+  $('.salir').click(function (e) {
+    e.preventDefault();
+    Swal.fire({
+      title: 'Salir',
+      text: "Seguro de querer salir?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, salir!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          'Vuelva pronto',
+          'Your file has been deleted.',
+          'success'
+        )
+        localStorage.removeItem('adminUser');
+        window.location.href = direccionLogin;
+      }
+    })
+  });
+</script>
+<nav>
+  <div class="nav-wrapper">
+    <a class="brand-logo left-on-large center-on-small">
+      <img src="../sheet_public/img/boplus.jpg" alt="Boplus" class="hide-on-med-and-down logo-boplus">
+    </a>
+    <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+      <i class="material-icons">menu</i>
+    </a>
+    <ul class="right hide-on-med-and-down">
+      <li class="inicio" id='inicio'>
+        <a href="./inscription.html">
+          <i class="material-icons left">local_activity</i>Registrar</a></li>
+      <li class="codig" id='codig'>
+        <a href="./list.html">
+          <i class="material-icons left">assignment</i>Editar</a></li>
+      <li class="materias" id='materias'>
+        <a href="./report.html">
+          <i class="material-icons left">assignment_turned_in</i>Reportes</a></li>
+      <li class="salir1" id='salir1'>
+        <a class="salir">
+          <i class="material-icons left">directions_run</i>Salir</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<ul class="sidenav" id="mobile-demo">
+  <li>
+    <a href="./inscription.html"><i class="material-icons left">local_activity</i>Registrar</a>
+  </li>
+  <li>
+    <a href="./list.html"><i class="material-icons left">assignment</i>Editar</a>
+  </li>
+  <li>
+    <a href="./report.html"><i class="material-icons left">assignment_turned_in</i>Reportes</a>
+  </li>
+  <li class="salir1" id='salir1'>
+    <a class="salir"><i class="material-icons left">directions_run</i>Salir</a>
+  </li>
+</ul>

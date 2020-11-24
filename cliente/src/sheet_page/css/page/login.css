@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2&family=Montserrat:wght@300&display=swap');
+
+html{
+    background: #870000;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #190A05, #870000);
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #190A05, #870000);
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    ;
+}
+body {
+    display: hidden;
+}
+.carta {
+    background: #fff;
+    padding: 2rem;
+    margin-top: 1rem;
+    border-radius: 1rem;
+}
+.titulo-login {
+    font-family: 'Exo 2', sans-serif;
+}
+.boton-ingreso {
+    margin-top: 3rem;
+    background: #620180;
+    font-family: 'Exo 2',
+    sans-serif;
+
+}
+
+.boton-ingreso:hover {
+    background: #22032B;
+    
+}
+input {
+    font-family: 'Montserrat',
+    sans-serif;
+}
+a {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    font-family: 'Montserrat',
+    sans-serif;
+    font-weight: 700;
+}

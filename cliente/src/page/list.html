@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inicio</title>
+
+    <!-- CSS  NORMALIZE-->
+    <link rel="stylesheet" href="../sheet_public/css/normalize.css">
+    <link rel="stylesheet" href="../sheet_page/css/default.css">
+    <!-- ESTILO CSS de MATERILIZE  -->
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- ESTILO CSS de plugin de carga SK-CIRCLE  -->
+
+    <!-- ESTILO CSS de hoja HTML  -->
+    <link rel="stylesheet" href="../sheet_page/css/page/list.css" />
+    <!-- Axios y JQUERY para los comandos  -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="../sheet_page/js/constants.js"></script>
+    <script src="../sheet_page/js/functionBase.js"></script>
+
+</head>
+<script>
+    //Variables Globales
+    var objetos = [];
+</script>
+<script>
+    $(document).ready(function () {
+        verificacionLogueo();
+        // Cargar codigo html DE FOOTER posible efecto modular
+        $('.area-footer').load('../component/footer.html');
+
+        $(".area-navbar").load('../component/navbar.html');
+        $(".area-modal").load("../component/modal.html");
+
+        //Peticion de la LISTA DE OBJETOS de todo la BASE DE DATOS
+        peticionLista().then(item => {
+            if (item != false) {
+                objetos = [...item];
+                item.map(date => {
+                    let datos = `
+                        <div class="row">
+                            <div class="col s3">
+                                <span>${date.code}${date.cifra}</span>
+                            </div>
+                            <div class="col s5">
+                                <span>${date.nombre}</span>
+                            </div>
+                            <div class="col s1">
+                                <span><button class="waves-effect waves-light btn  light-blue darken-3" onClick={viewObject(${date.iddatos})}>
+                                    Ver
+                                </button></span>
+                            </div>
+                             <div class="col s2">
+                                <span><button class="waves-effect waves-light btn light-green darken-3 quitar" onClick={modifyObject(${date.iddatos})}>
+                                    Modificar
+                                </button></span>
+                            </div>
+                            <div class="col s1">
+                                <span><button class="waves-effect waves-light btn red darken-1 quitar" onClick={deleteObject(${date.iddatos})}>
+                                    X
+                                </button></span>
+                            </div>
+                        </div>
+                    `
+                    $('.area-lista').append(datos);
+                })
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Datos Incorrectos',
+                    text: 'No se puede enlistar los Objetos Intene mas tarde',
+                })
+            }
+        })
+    });
+    //Funciones
+    //Creacion de tarjetas de objeto con la INFORMACION DE USUARIO
+    function viewObject(item) {
+        peticionViewObject(item).then(item => {
+            if (item != false) {
+                //Abrimos el MODAL para poder Ver la informacion
+                $("#modal1").modal("open");
+                let informacionObjeto = `
+                    <div class="card horizontal">
+                        <div class="card-image">
+                            <img src=${item[0].lugar}>
+                        </div>
+                        <div class="card-stacked">
+                            <div class="card-content">
+                                <div>CODIGO : ${item[0].code}${item[0].cifra}</div>
+                                <div>NOMBRE : ${item[0].nombre}</div>
+                                <div>COSTO : ${item[0].costo}</div>
+                                <div> AÑO : ${item[0].anio}</div>
+                                <div>ESTADO : ${item[0].estado}</div>
+                                <div>DESCRIPCION : ${item[0].descripcion}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row center-align">
+                        <img src=${item[0].imagen}>
+                    </div>
+                `;
+                $('.area-card-informacion').append(informacionObjeto);
+            } else {
+                //ERROR COLOCAR ALERTA
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Datos Incorrectos',
+                    text: 'No se puede Ver la informacion. Intente mas tarde',
+                })
+            }
+        });
+    }
+    //Funciones
+    function deleteObject(item) {
+        peticionDeleteObject(String(item)).then(date => {
+            if (date === true) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Correcto Dato Eliminado',
+                    text: 'Objeto eliminado correctamente',
+                })
+                var objetoBorrar = objetos.filter(
+                    (informacion) => informacion.iddatos != item
+                );
+                objetos = [...objetoBorrar];
+                $('.area-lista').fadeOut(1000);
+                $(".area-lista").empty();
+                objetos.map(date => {
+                    let datos = `
+                        <div class="row">
+                            <div class="col s3">
+                                <span>${date.code}${date.cifra}</span>
+                            </div>
+                            <div class="col s5">
+                                <span>${date.nombre}</span>
+                            </div>
+                            <div class="col s1">
+                                <span><button class="waves-effect waves-light btn  light-blue darken-3" onClick={viewObject(${date.iddatos})}>
+                                    Ver
+                                </button></span>
+                            </div>
+                                <div class="col s2">
+                                <span><button class="waves-effect waves-light btn light-green darken-3 quitar" onClick={modifyObject(${date.iddatos})}>
+                                    Modificar
+                                </button></span>
+                            </div>
+                            <div class="col s1">
+                                <span><button class="waves-effect waves-light btn red darken-1 quitar" onClick={deleteObject(${date.iddatos})}>
+                                    X
+                                </button></span>
+                            </div>
+                        </div>
+                    `
+                    $('.area-lista').append(datos);
+                    $('.area-lista').fadeIn(1000);
+
+                })
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Objeto no Eliminado',
+                    text: 'Problemas de servicio, intente mas tarde',
+                })
+            }
+        })
+    }
+    //
+    function modifyObject(item) {
+        console.log(item);
+        localStorage.setItem("idObjecto", item)
+        location.href = "./modify.html";
+    }
+    //Operaciones
+    //Peticion al SERVIDOR lista de todos los CODIGOS.
+    async function peticionLista() {
+        try {
+            const url = urlPeticionLista;
+            const peticion = await axios.post(url);
+            var resultado = peticion.data.response;
+            if (resultado === 'correcto') {
+                return peticion.data.information;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    //Operaciones
+    //Peticion al SERVIDOR objeto unico.
+    async function peticionViewObject(itemid) {
+        try {
+            const url = urlViewObjeto;
+            const peticion = await axios.post(url, {
+                iddatos: itemid
+            });
+            var resultado = peticion.data.response;
+            if (resultado === 'correcto') {
+                return peticion.data.information;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    //Peticion al SERVIDOR objeto unico.
+    async function peticionDeleteObject(itemid) {
+        try {
+            const url = urlDeleteObject;
+
+            const peticion = await axios.post(url, {
+                iddatos: itemid
+            });
+            var resultado = peticion.data.response;
+            if (resultado === 'correcto') {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+</script>
+
+<body>
+    <main>
+        <!------------ AREA MODAL  --------------->
+        <div class="area-modal"></div>
+        <!------------ AREA NAVBAR  --------------->
+        <div class="area-navbar"></div>
+        <!------------ AREA CONTAINER  --------------->
+        <div class="container">
+            <div class="row carta">
+                <div class="col s3 ">
+                    <span>Codigo</span>
+                </div>
+                <div class="col s5 ">
+                    <span>Nombre</span>
+                </div>
+
+                <div class="col s1 ">
+                    <span>Ver</span>
+                </div>
+                <div class="col s2 ">
+                    <span>Modificar</span>
+                </div>
+                <div class="col s1 ">
+                    <span> Eliminar</span>
+                </div>
+            </div>
+            <div class="area-lista"></div>
+        </div>
+    </main>
+
+    <!--------------------------------------- Footer ------------------------------------------>
+    <div class="area-footer"></div>
+
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</body>
+
+</html>

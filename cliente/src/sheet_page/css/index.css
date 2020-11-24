@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2&family=Montserrat:wght@300&display=swap');
+html {
+  font-size: 12px;
+  background: #870000;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #190A05, #870000);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #190A05, #870000);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+main {
+  flex: 1 0 auto;
+}
+.titulo-boplus {
+  padding: 2rem;
+  font-size: 2rem;
+  color: aliceblue;
+  font-family: 'Exo 2', sans-serif;
+  background: #5C0116;
+}
+
+.boton-ingreso {
+  margin-top: 3rem;
+  background: #620180;
+}
+.boton-ingreso:hover{
+  background: #22032B;
+}

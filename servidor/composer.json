@@ -8,6 +8,7 @@
     ],
     "require": {
         "endroid/qr-code": "^2.5",
-        "pugx/shortid-php": "^0.1.0"
+        "pugx/shortid-php": "^0.1.0",
+        "fpdf/fpdf": "^1.82"
     }
 }

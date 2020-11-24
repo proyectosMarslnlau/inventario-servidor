@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inicio</title>
+
+    <!-- CSS  NORMALIZE-->
+    <link rel="stylesheet" href="../sheet_public/css/normalize.css">
+    <link rel="stylesheet" href="../sheet_page/css/default.css">
+    <!-- ESTILO CSS de MATERILIZE  -->
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- ESTILO CSS de plugin de carga SK-CIRCLE  -->
+
+    <!-- ESTILO CSS de hoja HTML  -->
+    <link rel="stylesheet" href="../sheet_page/css/page/login.css" />
+    <!-- Axios y JQUERY para los comandos  -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="../sheet_page/js/constants.js"></script>
+
+</head>
+<script>
+    $(document).ready(function () {
+        $("body").css("display", "none");
+        $("body").fadeIn(2000);
+        // Cargar codigo html DE FOOTER posible efecto modular
+        //$(".footer").load("footer.html");
+        $('.area-footer').load('../component/footer.html');
+
+        $('.loginform').submit(function (e) {
+            e.preventDefault();
+            //Revision de datos
+            var user = $(".user").val();
+            var pass = $(".pass").val();
+            //Saneamiento de variables de entrada
+            user = user.toLowerCase();
+            pass = pass.toLowerCase();
+
+            //Se vacia el contenedor y se llena con el LOADING;
+            if (user.trim() === '' || pass.trim() === '') {
+                //DATOS VACIOS
+                Swal.fire(
+                    'Datos Vacios',
+                    'Datos Vacios revise nuevamente el formulario',
+                    'warning'
+                )
+            } else {
+                peticion(user, pass).then(item => {
+                    if (item === true) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Correcto',
+                            text: 'Bienvenido al sistema de INVENTARIO',
+                        })
+                        setTimeout(() => {
+                            window.location.href = direccionInscription;
+                        }, 1000);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Datos Incorrectos',
+                            text: 'Revise los Datos Registrados',
+                        })
+                    }
+                })
+            }
+        });
+    });
+
+    //Operaciones
+    async function peticion(usuario, password) {
+        try {
+            var url = urlLogin;
+            const peticionLogin = await axios.post(url, {
+                user: usuario,
+                pass: password
+            });
+
+            bandera = peticionLogin.data.response;
+            if (bandera === 'correcto') {
+                localStorage.setItem("adminUser", bandera)
+                return true
+            } else {
+                return false
+            }
+        } catch (error) {
+            console.log('INTENTE MAS TARDE')
+            /*setTimeout(function() { 
+                var respuesta = 'Sin Conexion Intente mas Tarde';
+                respuestaIncorrecta( respuesta )
+            }, 1000);*/
+        }
+    }
+</script>
+
+<body>
+    <main>
+        <div class="container">
+            <div class="">
+                <div class="row">
+                    <form class="loginform col s6 offset-s3">
+                        <div class="carta">
+                            <div class="row left">
+                                <h4 class="titulo-login">Ingrese sus Datos</h4>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s12">
+                                    <input id="user" type="text" class="user" name='user'>
+                                    <label for="user">Ingrese su Usuario</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s12">
+                                    <input id="pass" type="password" class="pass" name='pass'>
+                                    <label for="pass">Ingrese su Password</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <button class="login waves-effect waves-light btn-large col s12 boton-ingreso">
+                                    Ingresar
+                                </button>
+
+                            </div>
+                            <div class="row center-align">
+                                <a class="col s12" href="../../index.html">
+                                    Volver al inicio
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!--------------------------------------- Footer ------------------------------------------>
+    <div class="area-footer"></div>
+
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</body>
+
+</html>

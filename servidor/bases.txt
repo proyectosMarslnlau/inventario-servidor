@@ -3,5 +3,5 @@ DATOS ADMINISTRADOR
 id user pass imagenDefault
 
 DATOS DE INVENTARIO
-id codigo nombre lugar costo anio depreciacion imagen qr
+id codigo nombre lugar costo anio imagen qr
 
